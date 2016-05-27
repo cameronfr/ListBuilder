@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="cardlist">
+    {% if cards %}
+    {% for card in cards %}
+        {% include 'card.html' %}
+    {% endfor %}
+    {% endif %}
+    </div>
+{% endblock %}
