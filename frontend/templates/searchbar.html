@@ -1,0 +1,13 @@
+<div>
+  <noscript>
+    <!-- TODO: noscript support - can set form action to "get" by default (e.g. ?q=this&nojs=true), and change via js
+    <form id="searchform" method="get" action="http://localhost:5000/">
+            <input type="text" class="searchinput" name="q" size="21" maxlength="120"><input type="submit" value="search" class="searchbutton">
+    </form>
+    -->
+  </noscript>
+  <form onsubmit="searchBarSubmitQuery();" action="javascript:void(0);" id="searchBarForm">
+    <input type="text" id="searchBarCriteria" placeholder="Search Item"/>
+    <input type="button" onclick="searchBarSubmitQuery();" value="Search" id="searchBarButton"/>
+</form>
+</div>
