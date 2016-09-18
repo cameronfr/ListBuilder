@@ -1,7 +1,6 @@
 from flask import render_template, request, jsonify
 from frontend import app
-import cards.queryParser
-import cards.card
+from cards import card
 
 @app.route('/')
 @app.route('/index')
@@ -14,6 +13,6 @@ def getCardsHtml():
     query = request.args.get('query');
     cardsData = card.generateCards(query);
     cardsHTML = ""
-    for card in cardData:
-        cardsHTML += render_template('card.html',card=card)
+    for cardData in cardsData:
+        cardsHTML += render_template('card.html',card=cardData)
     return cardsHTML

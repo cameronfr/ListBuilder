@@ -1,47 +1,43 @@
 import xml.etree.ElementTree as ElementTree
 from spacy.en import English
-from cards import data as Data
-nlp = English()
+from cards import dataFetcher
+from cards import queryParser
 from collections import OrderedDict
 from itertools import islice
-#initialize all the connections in the beginning for speed, store them in an array or something
+nlp = English()
 
-def generateCard(subject,cardType):
-    print("generateCard: Generating card for object: <" + subject + "> and cardtype: <" + cardType + ">")
+def generateCards(query):
+    # print("generateCard: Generating card for object: <" + subject + "> and cardtype: <" + cardType + ">")
     data=[]
 
-    #TEMPORARY PARSING
-    if len(subject.split(' '))>1:
-        testCategories = [subject.split(' ')[1]]
-        subject = subject.split(' ')[0]
-    else:
-        testCategories = ["purpose","usage","art","grow","war","country","size","person","definition","names"]
+    parsedQuery = queryParser.parseQuery(query);
+    print(parsedQuery)
 
-    if(cardType == "Wikipedia_Parse"):
-        wpText = Data.extractTextData(subject)
-        wpText = nlp(wpText,parse=True)
+    wpText = dataFetcher.extractTextData(parsedQuery['object'])
+    wpText = nlp(wpText,parse=True)
+    for category in parsedQuery['properties']:
+        associations = dataFetcher.extractConceptnetAssociatons(category) + [{'word':category,'score':1}]
+        items = nlp_relevantSentences(wpText,associations)
+        items = sorted(items, key=lambda item: item['score'], reverse=True)
+        itemCard = {"title":category,'attributes':items[:12]}
+        print(itemCard);
+        data.append(itemCard)
 
-        for category in testCategories:
-            associations = Data._extractConceptnetAssociatons(category) + [{'word':category,'score':1}]
-            items = nlp_relevantSentences(wpText,associations)
-                #TODO: send cards as they are finished
-            items = sorted(items, key=lambda item: item['score'], reverse=True)
-            itemCard = {"title":category,'attributes':items[:12]}
-            data.append(itemCard)
+    dates = nlp_dates(wpText)
+    sortedDates = sorted(dates.items(), key=lambda t: t[1],reverse=True)
+    sortedDatesCard = {'title':"Dates",'attributes':sortedDates}
+    print(sortedDatesCard)
+    data.append(sortedDatesCard)
 
-        dates = nlp_dates(wpText)
-        sortedDates = OrderedDict(sorted(dates.items(), key=lambda t: t[1],reverse=True))
-        sortedDatesCard = {'title':"Dates",'attributes':sortedDates}
-        data.append(sortedDatesCard)
+    peoples = nlp_people(wpText)
+    peopleCard = {'title':"People",'attributes':peoples}
+    data.append(peopleCard)
 
-        peoples = nlp_people(wpText)
-        peopleCard = {'title':"People",'attributes':peoples}
-        data.append(peopleCard)
-
-        bag = nlp_bagOfWords(wpText)
-        sortedBag = OrderedDict(sorted(bag.items(), key=lambda t: t[1],reverse=True)[:15])
-        simpleBagCard = {'title':"Bag of Words",'attributes':sortedBag}
-        data.append(simpleBagCard)
+    bag = nlp_bagOfWords(wpText)
+    sortedBag = sorted(bag.items(), key=lambda t: t[1],reverse=True)[:15]
+    simpleBagCard = {'title':"Bag of Words",'attributes':sortedBag}
+    print (simpleBagCard)
+    data.append(simpleBagCard)
 
     return data;
     #FOR DISPLAYING, FOR NOW JUST PASS A MAP OF ATTRIBUTES AND THEIR VALUES TO CSS, CAN CODE NICE LOOKING "WIDGETS" LATER
@@ -49,15 +45,15 @@ def generateCard(subject,cardType):
 
 def nlp_relevantSentences(doc,subjects):
     for s in subjects:
-        s['word'] = nlp(s['word'],parse=False)[0]
+        s['word'] = nlp(s['word'],parse=True)[0]
     bag = []
     for sent in doc.sents:
         score = 0
         for t in sent:
             for s in subjects:
                 similarity = t.similarity(s['word'])
-                if similarity > 0.8:
-                    score += similarity*s['score']
+                if similarity > 0.5:
+                    score += similarity*s['score'] 
         if score>0:
             bag.append({"sent":sent.text,"score":score})
 
