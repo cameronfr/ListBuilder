@@ -6,8 +6,9 @@ from collections import OrderedDict
 from itertools import islice
 nlp = English()
 
+#TODO: Encapsulate into a "Card" class
+
 def generateCards(query):
-    # print("generateCard: Generating card for object: <" + subject + "> and cardtype: <" + cardType + ">")
     data=[]
 
     parsedQuery = queryParser.parseQuery(query);
@@ -23,27 +24,10 @@ def generateCards(query):
         print(itemCard);
         data.append(itemCard)
 
-    dates = nlp_dates(wpText)
-    sortedDates = sorted(dates.items(), key=lambda t: t[1],reverse=True)
-    sortedDatesCard = {'title':"Dates",'attributes':sortedDates}
-    print(sortedDatesCard)
-    data.append(sortedDatesCard)
-
-    peoples = nlp_people(wpText)
-    peopleCard = {'title':"People",'attributes':peoples}
-    data.append(peopleCard)
-
-    bag = nlp_bagOfWords(wpText)
-    sortedBag = sorted(bag.items(), key=lambda t: t[1],reverse=True)[:15]
-    simpleBagCard = {'title':"Bag of Words",'attributes':sortedBag}
-    print (simpleBagCard)
-    data.append(simpleBagCard)
-
     return data;
-    #FOR DISPLAYING, FOR NOW JUST PASS A MAP OF ATTRIBUTES AND THEIR VALUES TO CSS, CAN CODE NICE LOOKING "WIDGETS" LATER
-    #WHICH WOULD BE DEFINED IN THE CARD.xml->DISPLAY property
 
 def nlp_relevantSentences(doc,subjects):
+    print(subjects)
     for s in subjects:
         s['word'] = nlp(s['word'],parse=True)[0]
     bag = []
@@ -52,42 +36,10 @@ def nlp_relevantSentences(doc,subjects):
         for t in sent:
             for s in subjects:
                 similarity = t.similarity(s['word'])
-                if similarity > 0.5:
-                    score += similarity*s['score'] 
+                if similarity > 0.7:
+                    score += similarity*s['score']
         if score>0:
             bag.append({"sent":sent.text,"score":score})
-
-    return bag
-
-def nlp_bagOfWords(doc):
-    bag = {}
-    for t in doc:
-        if (t.is_ascii and not t.is_digit and not t.is_punct and not t.is_space and not t.is_oov and not '=' in t.orth_ and not t.is_stop and not t.like_num and not t.orth_ == '\'s'):
-            normalizedToken = t.lemma_.lower()
-            if normalizedToken in bag:
-                bag[normalizedToken] +=1
-            else:
-                bag[normalizedToken] = 1
-    return bag
-
-def nlp_dates(doc):
-    bag = {}
-    for sent in doc.sents:
-        parsedSent = nlp(sent.text)
-        for t in parsedSent.ents:
-            if t.label_ == 'DATE':
-                bag[t.orth_]=sent.text
-                break
-    return bag
-
-def nlp_people(doc):
-    bag = {}
-    for sent in doc.sents:
-        parsedSent = nlp(sent.text)
-        for t in parsedSent.ents:
-            if t.label_ == 'PERSON':
-                bag[t.orth_]=sent.text
-                break
 
     return bag
 
