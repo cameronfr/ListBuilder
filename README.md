@@ -1,5 +1,5 @@
 # ListBuilder
-Search sentences of Wikipedia pages. [more info](http://cameron.cf/posts/2016-07-12-2D%20Wikipedia%20Categorizer.html)
+Search sentences of Wikipedia pages. [more info](http://cameron.cf/posts/2016-07-12-Wikipedia%20Categorizer.html)
 
 
 ## Requirements
