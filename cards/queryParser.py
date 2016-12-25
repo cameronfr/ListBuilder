@@ -8,7 +8,8 @@ defaultProperties =  ["purpose","usage","art","grow","war","country","size","per
 
 def parseQuery(query):
     #TODO: actual subject and properties / question extraction
-    object = query.split(' ')[0]
+    query = query.rstrip()
+    object = query.rstrip().split(' ')[0]
 
     if len(query.split(' '))>1:
         properties = query.split(' ')[1:]
