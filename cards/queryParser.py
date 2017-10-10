@@ -12,10 +12,10 @@ def parseCriteria(criteria):
     criteria = criteria.rstrip()
     object = criteria.rstrip().split(' ')[0]
 
-    if len(criteria.split(' '))>1:
-        properties = criteria.split(' ')[1:]
+    if len(criteria.split(' '))>0:
+        properties = criteria.split(' ')[0:]
     else:
         properties = defaultProperties
 
-    parsedCriteria = {'object':object,'properties':properties}
+    parsedCriteria = {'properties':properties}
     return parsedCriteria

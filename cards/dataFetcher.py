@@ -41,13 +41,11 @@ def extractDataFromWikipedia(object):
     pages = response['query']['pages']
     firstpage = next (iter (pages.values()))
     text = firstpage['extract']
-    print(text)
     #remove "sources" and "see also" sections
     text = re.sub(r'==\ See also[\S\s]*','',text)
 
     #remove section titles
     text = re.sub(r'=+[^=]{1,100}=+','',text)
-    print(text)
     return text
 
 #Left as an example for extracting from specfific data sources in the form of SQL databases

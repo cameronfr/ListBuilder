@@ -4,25 +4,36 @@ from cards import dataFetcher
 from cards import queryParser
 from collections import OrderedDict
 from itertools import islice
+from newspaper import Article
 nlp = English()
 
 #TODO: Encapsulate into a "Card" class
 
 SIMILARITY_CUTOFF = 0.333
 
-def generateCards(query):
+def generateCards(criteria, contentURL):
     data=[]
 
-    print("Parsing Query: " + str(query))
-    parsedQuery = queryParser.parseQuery(query);
+    print("Parsing Query: " + "criteria: " + str(criteria) + "  URL/URI: " + str(contentURL))
+    parsedCriteria = queryParser.parseCriteria(criteria);
 
-    print("Fetching Wikipedia text for parsed query: " + str(parsedQuery))
-    wpText = dataFetcher.extractTextData(parsedQuery['object'])
-    wpText = nlp(wpText,parse=True)
-    for category in parsedQuery['properties']:
+    isURL = "http://" in contentURL or "https://" in contentURL
+    articleText = None
+    if(isURL):
+        article = Article(contentURL)
+        article.download()
+        article.parse()
+        articleText = article.text
+        articleText = nlp(articleText)
+    else:
+        print("Fetching Wikipedia text for parsed query: " + str(parsedCriteria))
+        articleText = dataFetcher.extractTextData(contentURL)
+        articleText = nlp(articleText,parse=True)
+
+    for category in parsedCriteria['properties']:
         associations = dataFetcher.extractConceptnetAssociatons(category) + [{'word':category,'score':1}]
         print("Found ConceptNet associations for category {}: {}".format(category,[x['word'] for x in associations]))
-        items = nlp_relevantSentences(wpText,associations)
+        items = nlp_relevantSentences(articleText,associations)
         items = sorted(items, key=lambda item: item['score'], reverse=True)
         itemCard = {"title":category,'attributes':items[:12]}
         print("Finished card for category {}".format(category))
