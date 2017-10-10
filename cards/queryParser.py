@@ -6,7 +6,7 @@ from random import random
 
 defaultProperties =  ["purpose","usage","art","grow","war","country","size","person","definition","names"]
 
-def parseQuery(criteria):
+def parseCriteria(criteria):
     #TODO: actual subject and properties / question extraction
     print(criteria)
     criteria = criteria.rstrip()
