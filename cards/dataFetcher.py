@@ -7,8 +7,8 @@ import re
 
 #This class fetches data from a couple of general sources, and returns it in a standard format
 
-conceptNetURIAPIString = "http://conceptnet5.media.mit.edu/data/5.4/uri?language=en&text=%s"
-conceptNetGraphAPIString = "http://conceptnet5.media.mit.edu/data/5.4/assoc%s?filter=/c/en/&limit=30"
+conceptNetURIAPIString = "http://api.conceptnet.io/c/en/%s?filter=/c/en"
+conceptNetGraphAPIString = "http://api.conceptnet.io/related/c/en/%s?filter=/c/en"
 wikipediaAPIString = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exlimit=max&explaintext&titles=%s&redirects"
 
 def extractTextData(object):
@@ -19,19 +19,17 @@ def extractDictionaryData(object):
 
 def extractConceptnetAssociatons(object):
     object = "_".join(object.split())
-    uriRequestString = conceptNetURIAPIString % object
-    uri = json.loads(urlopen(uriRequestString).read().decode("utf8"))['uri']
+    uri = object
     graphRequestString = conceptNetGraphAPIString  % uri
     response = json.loads(urlopen(graphRequestString).read().decode("utf8"))
     associations = []
-    for assoc in response['similar']:
-        associations.append({"word": assoc[0].split('/')[-1], "score":float(assoc[1])})
+    for assoc in response['related']:
+        associations.append({"word": assoc['@id'].split('/')[-1], "score":float(assoc['weight'])})
     return associations
 
 def extractConceptnetEdges(object):
     object = "_".join(object.split())
-    uriRequestString = conceptNetURIAPIString % object
-    uri = json.loads(urlopen(uriRequestString).read().decode("utf8"))['uri']
+    uri = object
     graphRequestString = conceptNetGraphAPIString % uri
     response = json.loads(urlopen(graphRequestString).read().decode("utf8"))
     return response
