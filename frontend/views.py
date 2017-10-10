@@ -10,8 +10,9 @@ def index():
 
 @app.route('/ajax/get_cards_html')
 def getCardsHtml():
-    query = request.args.get('query');
-    cardsData = card.generateCards(query);
+    criteria = request.args.get('criteria');
+    contentURL = request.args.get('contentURL')
+    cardsData = card.generateCards(criteria, contentURL);
     cardsHTML = ""
     for cardData in cardsData:
         cardsHTML += render_template('card.html',card=cardData)

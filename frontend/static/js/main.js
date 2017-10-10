@@ -1,13 +1,16 @@
 function searchBarSubmitQuery() {
-  query = document.getElementById("searchBarCriteria").value;
+  criteria = document.getElementById("searchBarCriteria").value;
+  contentURL = document.getElementById("searchBarURL").value;
   $.ajax({
     url: "ajax/get_cards_html",
     data: {
-      query: query
+      criteria:criteria,
+      contentURL:contentURL
     },
     success: addCardHTML,
     error: function(error) {
       console.log(error);
+      //have python return error status code -> show error message here
     }
   });
 }
