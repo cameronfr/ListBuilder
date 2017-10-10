@@ -6,15 +6,16 @@ from random import random
 
 defaultProperties =  ["purpose","usage","art","grow","war","country","size","person","definition","names"]
 
-def parseQuery(query):
+def parseQuery(criteria):
     #TODO: actual subject and properties / question extraction
-    query = query.rstrip()
-    object = query.rstrip().split(' ')[0]
+    print(criteria)
+    criteria = criteria.rstrip()
+    object = criteria.rstrip().split(' ')[0]
 
-    if len(query.split(' '))>1:
-        properties = query.split(' ')[1:]
+    if len(criteria.split(' '))>1:
+        properties = criteria.split(' ')[1:]
     else:
         properties = defaultProperties
 
-    parsedQuery = {'object':object,'properties':properties}
-    return parsedQuery
+    parsedCriteria = {'object':object,'properties':properties}
+    return parsedCriteria
